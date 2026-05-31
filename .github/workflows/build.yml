@@ -1,0 +1,142 @@
+name: Build & Test
+
+on:
+  push:
+    branches: ['develop', 'main', 'release/*']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  linux-device:
+    name: Linux device
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libffi-dev libcurl4-openssl-dev
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Bundle the React UI bindings, demos and tests
+        run: yarn bundle
+      - name: Configure
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_LVGL_SIMULATOR=OFF \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+            -DUSE_EXTERNAL_FFI=ON
+      - name: Build lvgljs
+        run: cmake --build build -j
+      - name: Run tests
+        run: build/lvgljs run scripts/run-tests.js --capture
+      - name: Upload test screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lvgljs-test-screenshots-linux-device
+          path: _screenshots/
+          retention-days: 90
+
+  linux:
+    name: Linux
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libffi-dev libsdl2-dev libcurl4-openssl-dev xvfb
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Bundle the React UI bindings, demos and tests
+        run: yarn bundle
+      - name: Configure
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_LVGL_SIMULATOR=ON \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+            -DUSE_EXTERNAL_FFI=ON
+      - name: Build lvgljs
+        run: cmake --build build -j
+      - name: Run tests
+        run: xvfb-run -a build/lvgljs run scripts/run-tests.js --capture
+      - name: Upload test screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lvgljs-test-screenshots-linux
+          path: _screenshots/
+          retention-days: 90
+
+  macos:
+    name: macOS
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install system dependencies
+        run: brew install ninja sdl2 libffi curl
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Bundle the React UI bindings, demos and tests
+        run: yarn bundle
+      - name: Configure
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_LVGL_SIMULATOR=ON \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+            -DUSE_EXTERNAL_FFI=ON \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix sdl2);$(brew --prefix libffi);$(brew --prefix curl)"
+      - name: Build lvgljs
+        run: cmake --build build -j
+      - name: Run tests
+        run: build/lvgljs run scripts/run-tests.js --capture
+      - name: Upload test screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lvgljs-test-screenshots-macos
+          path: _screenshots/
+          retention-days: 90
+
+  collect-screenshots:
+    name: Collect test screenshots
+    needs: [linux-device, linux, macos]
+    if: always() && !cancelled()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Download all workflow artifacts
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          pattern: lvgljs-test-screenshots-*
+          path: artifacts
+      - name: Upload combined test screenshots
+        if: hashFiles('artifacts/**') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: lvgljs-test-screenshots
+          path: artifacts/
+          retention-days: 90
