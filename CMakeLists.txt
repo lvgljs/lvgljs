@@ -21,6 +21,7 @@ add_executable(lvgljs
     src/render/native/core/event/select/select.cpp
     src/render/native/core/event/click/click.cpp
     src/render/native/core/refresh/refresh.cpp
+    src/render/native/core/lv_conf/lv_conf.cpp
     src/render/native/core/utils/utils.cpp
     src/render/native/core/theme/theme.cpp
     src/render/native/core/dimensions/dimensions.cpp
