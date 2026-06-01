@@ -50,7 +50,7 @@ export type FlexStyleType = {
 export function FlexStyle(style: FlexStyleType, result) {
   if (style.display !== "flex") return result;
 
-  let flexFlow = 0x00;
+  let flexFlow = LV_FLEX_FLOW_ROW;
   const flexDirection = style["flex-direction"] || "row";
   const flexWrap = style["flex-wrap"] || "nowrap";
 
