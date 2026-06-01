@@ -1,3 +1,9 @@
+import {
+  LV_KEYBOARD_MODE_NUMBER,
+  LV_KEYBOARD_MODE_SPECIAL,
+  LV_KEYBOARD_MODE_TEXT_LOWER,
+  LV_KEYBOARD_MODE_TEXT_UPPER,
+} from "../../core/lv_conf";
 import { CommonComponentApi, CommonProps } from "../common/index";
 import {
   EVENTTYPE_MAP,
@@ -12,10 +18,10 @@ const bridge = globalThis[Symbol.for('lvgljs')];
 const NativeView = bridge.NativeRender.NativeComponents.Keyboard;
 
 const modes = {
-  lower: 0,
-  upper: 1,
-  special: 2,
-  number: 3,
+  lower: LV_KEYBOARD_MODE_TEXT_LOWER,
+  upper: LV_KEYBOARD_MODE_TEXT_UPPER,
+  special: LV_KEYBOARD_MODE_SPECIAL,
+  number: LV_KEYBOARD_MODE_NUMBER,
 };
 
 export type KeyboardProps = CommonProps & {

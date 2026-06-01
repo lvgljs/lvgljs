@@ -1,3 +1,9 @@
+import {
+  LV_CHART_TYPE_BAR,
+  LV_CHART_TYPE_LINE,
+  LV_CHART_TYPE_NONE,
+  LV_CHART_TYPE_SCATTER,
+} from "../../core/lv_conf";
 import { StyleProps } from "../../core/style";
 import { colorTransform } from "../../core/style/color";
 import { CommonComponentApi, CommonProps } from "../common/index";
@@ -13,10 +19,10 @@ const bridge = globalThis[Symbol.for('lvgljs')];
 const NativeChart = bridge.NativeRender.NativeComponents.Chart;
 
 const chartType = {
-  none: 0,
-  line: 1,
-  bar: 2,
-  scatter: 3,
+  none: LV_CHART_TYPE_NONE,
+  line: LV_CHART_TYPE_LINE,
+  bar: LV_CHART_TYPE_BAR,
+  scatter: LV_CHART_TYPE_SCATTER,
 };
 
 export type ChartProps = CommonProps & {
