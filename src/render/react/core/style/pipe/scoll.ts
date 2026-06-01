@@ -1,5 +1,18 @@
 import { LV_DIR_MAP } from "../../lv_dir_map";
+import {
+  LV_SCROLL_SNAP_CENTER,
+  LV_SCROLL_SNAP_END,
+  LV_SCROLL_SNAP_NONE,
+  LV_SCROLL_SNAP_START,
+} from "../../lv_conf";
 import { ProcessBoolean, ProcessColor, ProcessEnum, ProcessPx } from "../util";
+
+const scrollSnapMap = {
+  none: LV_SCROLL_SNAP_NONE,
+  snap_start: LV_SCROLL_SNAP_START,
+  snap_end: LV_SCROLL_SNAP_END,
+  snap_center: LV_SCROLL_SNAP_CENTER,
+};
 
 const obj = {
   overflow: ProcessEnum({
@@ -12,18 +25,8 @@ const obj = {
     touch: 1,
   }),
   "scroll-dir": ProcessEnum(LV_DIR_MAP),
-  "scroll-snap-x": ProcessEnum({
-    none: 0,
-    snap_start: 1,
-    snap_end: 2,
-    snap_center: 3,
-  }),
-  "scroll-snap-y": ProcessEnum({
-    none: 0,
-    snap_start: 1,
-    snap_end: 2,
-    snap_center: 3,
-  }),
+  "scroll-snap-x": ProcessEnum(scrollSnapMap),
+  "scroll-snap-y": ProcessEnum(scrollSnapMap),
   "scroll-enable-snap": ProcessBoolean,
 };
 const keys = Object.keys(obj);

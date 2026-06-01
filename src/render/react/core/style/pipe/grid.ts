@@ -1,39 +1,49 @@
-import { LV_GRID_CONTENT, LV_GRID_FR } from "../../lv_conf";
+import {
+  LV_GRID_ALIGN_CENTER,
+  LV_GRID_ALIGN_END,
+  LV_GRID_ALIGN_SPACE_AROUND,
+  LV_GRID_ALIGN_SPACE_BETWEEN,
+  LV_GRID_ALIGN_SPACE_EVENLY,
+  LV_GRID_ALIGN_START,
+  LV_GRID_ALIGN_STRETCH,
+  LV_GRID_CONTENT,
+  LV_GRID_FR,
+} from "../../lv_conf";
 import { NormalizePx } from "../util";
 
 const FR_REG = /([\d]+)fr$/;
 
 const gridChildJustifySelfObj = {
-  start: 0,
-  end: 2,
-  center: 1,
-  stretch: 3,
+  start: LV_GRID_ALIGN_START,
+  end: LV_GRID_ALIGN_END,
+  center: LV_GRID_ALIGN_CENTER,
+  stretch: LV_GRID_ALIGN_STRETCH,
 };
 const gridChildAlignSelfObj = {
-  start: 0,
-  end: 2,
-  center: 1,
-  stretch: 3,
+  start: LV_GRID_ALIGN_START,
+  end: LV_GRID_ALIGN_END,
+  center: LV_GRID_ALIGN_CENTER,
+  stretch: LV_GRID_ALIGN_STRETCH,
 };
 
 const gridJustifyContentObj = {
-  start: 0,
-  end: 2,
-  center: 1,
-  "space-evenly": 4,
-  "space-around": 5,
-  "space-between": 6,
-  stretch: 3,
+  start: LV_GRID_ALIGN_START,
+  end: LV_GRID_ALIGN_END,
+  center: LV_GRID_ALIGN_CENTER,
+  "space-evenly": LV_GRID_ALIGN_SPACE_EVENLY,
+  "space-around": LV_GRID_ALIGN_SPACE_AROUND,
+  "space-between": LV_GRID_ALIGN_SPACE_BETWEEN,
+  stretch: LV_GRID_ALIGN_STRETCH,
 };
 
 const gridAlignItemsObj = {
-  start: 0,
-  end: 2,
-  center: 1,
-  "space-evenly": 4,
-  "space-around": 5,
-  "space-between": 6,
-  stretch: 3,
+  start: LV_GRID_ALIGN_START,
+  end: LV_GRID_ALIGN_END,
+  center: LV_GRID_ALIGN_CENTER,
+  "space-evenly": LV_GRID_ALIGN_SPACE_EVENLY,
+  "space-around": LV_GRID_ALIGN_SPACE_AROUND,
+  "space-between": LV_GRID_ALIGN_SPACE_BETWEEN,
+  stretch: LV_GRID_ALIGN_STRETCH,
 };
 
 export type GridStyleType = {
