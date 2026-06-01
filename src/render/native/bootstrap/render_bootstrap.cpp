@@ -3,6 +3,7 @@
 #include "engine/hal/screenshot.hpp"
 #include "native/components/component.hpp"
 #include "native/core/animate/animate.hpp"
+#include "native/core/lv_conf/lv_conf.hpp"
 #include "native/core/dimensions/dimensions.hpp"
 #include "native/core/refresh/refresh.hpp"
 #include "native/core/theme/theme.hpp"
@@ -18,6 +19,8 @@ void NativeRenderInit (JSContext* ctx, JSValue ns) {
     NativeEventWrapInit(ctx);
 
     NativeAnimateInit(ctx, obj);
+
+    NativeLvConfInit(ctx, obj);
 
     NativeDimensionsInit(ctx, obj);
 
