@@ -1,13 +1,18 @@
 import { ColorType } from "../color";
 import { ProcessColor, ProcessEnum } from "../util";
+import {
+  LV_GRAD_DIR_HOR,
+  LV_GRAD_DIR_NONE,
+  LV_GRAD_DIR_VER,
+} from "../../lv_conf";
 
 const obj = {
   "background-color": ProcessColor,
   "background-grad-color": ProcessColor,
   "background-grad-color-dir": ProcessEnum({
-    none: 0,
-    vertical: 1,
-    horizontal: 2,
+    none: LV_GRAD_DIR_NONE,
+    vertical: LV_GRAD_DIR_VER,
+    horizontal: LV_GRAD_DIR_HOR,
   }),
 };
 const keys = Object.keys(obj);
