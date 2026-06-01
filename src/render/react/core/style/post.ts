@@ -32,10 +32,7 @@ export function PostProcessStyle({ comp, styleSheet, styleType }: { comp: any; s
         });
     } else {
       getImageBinary(url)
-        .then(
-          (buffer) => comp.setBackgroundImage(Buffer.from(buffer).buffer),
-          styleType,
-        )
+        .then((buffer) => comp.setBackgroundImage(buffer, styleType))
         .catch(console.warn);
     }
   }
@@ -63,10 +60,7 @@ export function PostProcessStyle({ comp, styleSheet, styleType }: { comp: any; s
         });
     } else {
       getImageBinary(url)
-        .then(
-          (buffer) => comp.setArcImage(Buffer.from(buffer).buffer),
-          styleType,
-        )
+        .then((buffer) => comp.setArcImage(buffer, styleType))
         .catch(console.warn);
     }
   }
