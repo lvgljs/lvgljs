@@ -15,12 +15,12 @@ jobs:
     name: Linux device
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -42,7 +42,7 @@ jobs:
         run: build/lvgljs run scripts/run-tests.js --capture
       - name: Upload test screenshots
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lvgljs-test-screenshots-linux-device
           path: _screenshots/
@@ -52,12 +52,12 @@ jobs:
     name: Linux
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -79,7 +79,7 @@ jobs:
         run: xvfb-run -a build/lvgljs run scripts/run-tests.js --capture
       - name: Upload test screenshots
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lvgljs-test-screenshots-linux
           path: _screenshots/
@@ -89,12 +89,12 @@ jobs:
     name: macOS
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
       - name: Install system dependencies
         run: brew install ninja sdl2 libffi curl
       - name: Install dependencies
@@ -115,7 +115,7 @@ jobs:
         run: build/lvgljs run scripts/run-tests.js --capture
       - name: Upload test screenshots
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lvgljs-test-screenshots-macos
           path: _screenshots/
@@ -128,14 +128,14 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Download all workflow artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         continue-on-error: true
         with:
           pattern: lvgljs-test-screenshots-*
           path: artifacts
       - name: Upload combined test screenshots
         if: hashFiles('artifacts/**') != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lvgljs-test-screenshots
           path: artifacts/
