@@ -42,7 +42,7 @@ function setImageProps(comp, newProps: ImageProps, oldProps: ImageProps) {
         }
         if (!isValidUrl(url)) {
           if (!path.isAbsolute(url)) {
-            url = path.resolve(url);
+            url = path.resolve(import.meta.dirname, url);
           }
           tjs.readFile(url, { encoding: "binary" })
             .then((data) => {
