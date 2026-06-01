@@ -1,5 +1,19 @@
 import { ColorType } from "../color";
 import { ProcessColor, ProcessEnum, ProcessPx } from "../util";
+import {
+  LV_LABEL_LONG_CLIP,
+  LV_LABEL_LONG_DOT,
+  LV_LABEL_LONG_SCROLL,
+  LV_LABEL_LONG_SCROLL_CIRCULAR,
+  LV_LABEL_LONG_WRAP,
+  LV_TEXT_ALIGN_AUTO,
+  LV_TEXT_ALIGN_CENTER,
+  LV_TEXT_ALIGN_LEFT,
+  LV_TEXT_ALIGN_RIGHT,
+  LV_TEXT_DECOR_NONE,
+  LV_TEXT_DECOR_STRIKETHROUGH,
+  LV_TEXT_DECOR_UNDERLINE,
+} from "../../lv_conf";
 
 const builtInFontList = [
   8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46,
@@ -11,22 +25,22 @@ const obj = {
   "letter-spacing": ProcessPx,
   "line-spacing": ProcessPx,
   "text-overflow": ProcessEnum({
-    ellipsis: 1,
-    clip: 4,
-    auto: 0,
-    scroll: 2,
-    circular: 3,
+    ellipsis: LV_LABEL_LONG_DOT,
+    clip: LV_LABEL_LONG_CLIP,
+    auto: LV_LABEL_LONG_WRAP,
+    scroll: LV_LABEL_LONG_SCROLL,
+    circular: LV_LABEL_LONG_SCROLL_CIRCULAR,
   }),
   "text-align": ProcessEnum({
-    auto: 0,
-    left: 1,
-    center: 2,
-    right: 3,
+    auto: LV_TEXT_ALIGN_AUTO,
+    left: LV_TEXT_ALIGN_LEFT,
+    center: LV_TEXT_ALIGN_CENTER,
+    right: LV_TEXT_ALIGN_RIGHT,
   }),
   "text-decoration": ProcessEnum({
-    none: 0,
-    underline: 1,
-    strikethrough: 2,
+    none: LV_TEXT_DECOR_NONE,
+    underline: LV_TEXT_DECOR_UNDERLINE,
+    strikethrough: LV_TEXT_DECOR_STRIKETHROUGH,
   }),
   "font-size": ProcessPx,
 };
