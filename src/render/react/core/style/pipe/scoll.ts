@@ -1,3 +1,4 @@
+import { LV_DIR_MAP } from "../../lv_dir_map";
 import { ProcessBoolean, ProcessColor, ProcessEnum, ProcessPx } from "../util";
 
 const obj = {
@@ -10,16 +11,7 @@ const obj = {
     auto: 0,
     touch: 1,
   }),
-  "scroll-dir": ProcessEnum({
-    none: 0,
-    left: 1 << 0,
-    right: 1 << 1,
-    top: 1 << 2,
-    bottom: 1 << 3,
-    horizontal: (1 << 0) | (1 << 1),
-    vertical: (1 << 2) | (1 << 3),
-    all: (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3),
-  }),
+  "scroll-dir": ProcessEnum(LV_DIR_MAP),
   "scroll-snap-x": ProcessEnum({
     none: 0,
     snap_start: 1,

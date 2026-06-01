@@ -4,6 +4,7 @@ export { handleEvent } from "../core/event";
 export { unRegistEvent, EVENTTYPE_MAP } from "../core/event";
 export { setStyle } from "../core/style";
 import * as React from 'react';
+import { LV_DIR_MAP } from "../core/lv_dir_map";
 
 const components = new Map<LvgljsComponentConfig<any, any>['tagName'], LvgljsComponentConfig<any, any>>();
 
@@ -80,16 +81,7 @@ export const STYLE_TYPE = {
   STATE_DISABLED: 0x0080,
 };
 
-export const EDropdownlistDirection = {
-  none: 0x00,
-  left: 1 << 0,
-  right: 1 << 1,
-  top: 1 << 2,
-  bottom: 1 << 3,
-  horizontal: (1 << 0) | (1 << 1),
-  vertical: (1 << 2) | (1 << 3),
-  all: (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3),
-};
+export const EDropdownlistDirection = LV_DIR_MAP;
 
 export const EDropdownListArrowDirection = {
   up: 0,

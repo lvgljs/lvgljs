@@ -6,6 +6,7 @@ import {
   setStyle,
   styleGetterProp,
 } from "../config";
+import { LV_DIR_MAP } from "../../core/lv_dir_map";
 
 const bridge = globalThis[Symbol.for('lvgljs')];
 const NativeTabs = bridge.NativeRender.NativeComponents.TabView;
@@ -46,16 +47,9 @@ function setTabsProps(comp, newProps: TabsProps, oldProps: TabsProps) {
   });
 }
 
-const tabPositionObj = {
-  left: 1 << 0,
-  top: 1 << 2,
-  right: 1 << 1,
-  bottom: 1 << 3,
-};
-
 export class TabsComp extends NativeTabs {
   constructor({ uid, tabPosition, tabSize = 0 }) {
-    tabPosition = tabPositionObj[tabPosition] || tabPositionObj.top;
+    tabPosition = LV_DIR_MAP[tabPosition] || LV_DIR_MAP.top;
     super({ uid, tabPosition, tabSize });
     this.uid = uid;
 
