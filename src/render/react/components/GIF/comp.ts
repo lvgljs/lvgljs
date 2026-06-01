@@ -51,7 +51,7 @@ function setGIFProps(comp, newProps: GIFProps, oldProps: GIFProps) {
             });
         } else {
           getGIFBinary(url)
-            .then((buffer) => comp.setGIFBinary(Buffer.from(buffer).buffer))
+            .then((buffer) => comp.setGIFBinary(buffer))
             .catch(console.warn);
         }
       }

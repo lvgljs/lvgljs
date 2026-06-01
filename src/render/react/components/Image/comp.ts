@@ -53,7 +53,7 @@ function setImageProps(comp, newProps: ImageProps, oldProps: ImageProps) {
             });
         } else {
           getImageBinary(url)
-            .then((buffer) => comp.setImageBinary(Buffer.from(buffer).buffer))
+            .then((buffer) => comp.setImageBinary(buffer))
             .catch(console.warn);
         }
       }
