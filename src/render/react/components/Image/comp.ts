@@ -3,6 +3,7 @@ import { isValidUrl } from "../../utils/helpers";
 import { CommonComponentApi, CommonProps } from "../common/index";
 import {
   EVENTTYPE_MAP,
+  STYLE_TYPE,
   handleEvent,
   setStyle,
   styleGetterProp,
@@ -98,7 +99,7 @@ export class ImageComp extends NativeImage {
   close() {
     super.close();
   }
-  setStyle(style, type = 0x0000) {
+  setStyle(style, type = STYLE_TYPE.PART_MAIN) {
     setStyle({
       comp: this,
       styleSheet: style,
