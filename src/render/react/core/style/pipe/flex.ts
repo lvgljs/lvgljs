@@ -1,21 +1,38 @@
+import {
+  LV_FLEX_ALIGN_CENTER,
+  LV_FLEX_ALIGN_END,
+  LV_FLEX_ALIGN_SPACE_AROUND,
+  LV_FLEX_ALIGN_SPACE_BETWEEN,
+  LV_FLEX_ALIGN_SPACE_EVENLY,
+  LV_FLEX_ALIGN_START,
+  LV_FLEX_FLOW_COLUMN,
+  LV_FLEX_FLOW_COLUMN_REVERSE,
+  LV_FLEX_FLOW_COLUMN_WRAP,
+  LV_FLEX_FLOW_COLUMN_WRAP_REVERSE,
+  LV_FLEX_FLOW_ROW,
+  LV_FLEX_FLOW_ROW_REVERSE,
+  LV_FLEX_FLOW_ROW_WRAP,
+  LV_FLEX_FLOW_ROW_WRAP_REVERSE,
+} from "../../lv_conf";
+
 const flexFlowObj = {
-  row_nowrap: 0x00,
-  column_nowrap: 1 << 0,
-  row_wrap: 0x00 | (1 << 2),
-  column_wrap: (1 << 0) | (1 << 2),
-  "row_wrap-reverse": 0x00 | (1 << 2) | (1 << 3),
-  "column_wrap-reverse": (1 << 0) | (1 << 2) | (1 << 3),
-  row_reverse: 0x00 | (1 << 3),
-  column_reverse: 0x00 | (1 << 3),
+  row_nowrap: LV_FLEX_FLOW_ROW,
+  column_nowrap: LV_FLEX_FLOW_COLUMN,
+  row_wrap: LV_FLEX_FLOW_ROW_WRAP,
+  column_wrap: LV_FLEX_FLOW_COLUMN_WRAP,
+  "row_wrap-reverse": LV_FLEX_FLOW_ROW_WRAP_REVERSE,
+  "column_wrap-reverse": LV_FLEX_FLOW_COLUMN_WRAP_REVERSE,
+  row_reverse: LV_FLEX_FLOW_ROW_REVERSE,
+  column_reverse: LV_FLEX_FLOW_COLUMN_REVERSE,
 };
 
 const flexAlignObj = {
-  "flex-start": 0,
-  "flex-end": 1,
-  center: 2,
-  "space-evenly": 3,
-  "space-around": 4,
-  "space-between": 5,
+  "flex-start": LV_FLEX_ALIGN_START,
+  "flex-end": LV_FLEX_ALIGN_END,
+  center: LV_FLEX_ALIGN_CENTER,
+  "space-evenly": LV_FLEX_ALIGN_SPACE_EVENLY,
+  "space-around": LV_FLEX_ALIGN_SPACE_AROUND,
+  "space-between": LV_FLEX_ALIGN_SPACE_BETWEEN,
 };
 
 type IntegerGreaterThanOne = number;
