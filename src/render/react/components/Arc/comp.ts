@@ -1,3 +1,8 @@
+import {
+  LV_ARC_MODE_NORMAL,
+  LV_ARC_MODE_REVERSE,
+  LV_ARC_MODE_SYMMETRICAL,
+} from "../../core/lv_conf";
 import { StyleProps } from "../../core/style";
 import { CommonComponentApi, CommonProps, OnChangeEvent } from "../common/index";
 import {
@@ -12,9 +17,9 @@ const bridge = globalThis[Symbol.for('lvgljs')];
 const NativeArc = bridge.NativeRender.NativeComponents.Arc;
 
 const modes = {
-  normal: 0,
-  symmetrical: 1,
-  reverse: 2,
+  normal: LV_ARC_MODE_NORMAL,
+  symmetrical: LV_ARC_MODE_SYMMETRICAL,
+  reverse: LV_ARC_MODE_REVERSE,
 };
 
 export type ArcProps = CommonProps & {
