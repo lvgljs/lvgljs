@@ -1,22 +1,29 @@
 import { ColorType } from "../color";
 import { ProcessColor, ProcessEnum, ProcessPx } from "../util";
+import {
+  LV_BORDER_SIDE_BOTTOM,
+  LV_BORDER_SIDE_FULL,
+  LV_BORDER_SIDE_LEFT,
+  LV_BORDER_SIDE_RIGHT,
+  LV_BORDER_SIDE_TOP,
+} from "../../lv_conf";
 
 const obj = {
   "border-radius": ProcessPx,
   "border-width": ProcessPx,
   "border-color": ProcessColor,
   "border-side": ProcessEnum({
-    left: 0x04,
-    right: 0x08,
-    full: 0x0f,
-    top: 0x02,
-    bottom: 0x01,
-    "top-right": 0x02 | 0x08,
-    "top-bottom": 0x02 | 0x01,
-    "top-left": 0x02 | 0x04,
-    "right-bottom": 0x08 | 0x01,
-    "right-left": 0x08 | 0x04,
-    "bottom-left": 0x01 | 0x04,
+    left: LV_BORDER_SIDE_LEFT,
+    right: LV_BORDER_SIDE_RIGHT,
+    full: LV_BORDER_SIDE_FULL,
+    top: LV_BORDER_SIDE_TOP,
+    bottom: LV_BORDER_SIDE_BOTTOM,
+    "top-right": LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_RIGHT,
+    "top-bottom": LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM,
+    "top-left": LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT,
+    "right-bottom": LV_BORDER_SIDE_RIGHT | LV_BORDER_SIDE_BOTTOM,
+    "right-left": LV_BORDER_SIDE_RIGHT | LV_BORDER_SIDE_LEFT,
+    "bottom-left": LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_LEFT,
   }),
 };
 const keys = Object.keys(obj);
