@@ -22,6 +22,7 @@
 //   TEST_SCREENSHOT_OUT  output directory for --capture (default <repo>/_screenshots)
 //   TEST_CAPTURE         set to "1" for each child test when --capture is active (stable screenshots)
 //
+// Per-test render overrides live in RENDER_MS_OVERRIDES (e.g. remote GIF fetch needs more time).
 // The harness is itself a lvgljs program, so it reports its verdict via
 // tjs.exit() (HARNESS_EXIT_OK / HARNESS_EXIT_FAIL / HARNESS_EXIT_ERROR).
 
@@ -53,10 +54,22 @@ const screenshotOut = path.resolve(
 
 const captureRenderMs = parseInt(tjs.env.TEST_RENDER_MS || '2500', 10);
 const captureSettleMs = parseInt(tjs.env.TEST_SETTLE_MS || '1200', 10);
-const renderMs = captureMode
+const defaultRenderMs = captureMode
     ? captureRenderMs + captureSettleMs
     : parseInt(tjs.env.TEST_RENDER_MS || '1500', 10);
 const hardTimeoutMs = parseInt(tjs.env.TEST_TIMEOUT_MS || '15000', 10);
+
+// Per-test render window (ms) when the default is too short (e.g. remote GIF fetch).
+const RENDER_MS_OVERRIDES = {
+    'test/gif/1/index.js': 8000,
+};
+
+function resolveRenderMs(relPath) {
+    if (RENDER_MS_OVERRIDES[relPath] != null) {
+        return RENDER_MS_OVERRIDES[relPath];
+    }
+    return defaultRenderMs;
+}
 
 const FAILURE_MARKERS = [
     /Assertion .* failed/,        // debug-build C assert (abort)
@@ -132,7 +145,8 @@ async function screenshotExists(filePath) {
 }
 
 async function runTest(absPath, relPath, screenshotPath = '') {
-    tjs.env.TEST_RENDER_MS = String(renderMs);
+    const testRenderMs = resolveRenderMs(relPath);
+    tjs.env.TEST_RENDER_MS = String(testRenderMs);
     if (screenshotPath) {
         tjs.env.TEST_SCREENSHOT_PATH = screenshotPath;
         tjs.env.TEST_CAPTURE = '1';
@@ -216,15 +230,17 @@ async function main() {
     }
 
     const modeLabel = captureMode ? `capture -> ${toRelative(screenshotOut)}` : 'test';
-    console.log(`Found ${tests.length} test(s) (${modeLabel}). Render window: ${renderMs}ms, hard timeout: ${hardTimeoutMs}ms\n`);
+    console.log(`Found ${tests.length} test(s) (${modeLabel}). Default render window: ${defaultRenderMs}ms, hard timeout: ${hardTimeoutMs}ms\n`);
 
     const failures = [];
     for (const test of tests) {
         const screenshotPath = captureMode
             ? path.join(screenshotOut, pngName(test.rel))
             : '';
+        const testRenderMs = resolveRenderMs(test.rel);
         const result = await runTest(test.abs, test.rel, screenshotPath);
-        console.log(`${result.ok ? 'PASS' : 'FAIL'}  ${test.rel}`);
+        const renderNote = testRenderMs !== defaultRenderMs ? ` (${testRenderMs}ms)` : '';
+        console.log(`${result.ok ? 'PASS' : 'FAIL'}  ${test.rel}${renderNote}`);
         if (!result.ok) {
             failures.push({ test, result });
             console.log(`      reason: ${result.reason}`);
