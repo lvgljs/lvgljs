@@ -59,9 +59,9 @@ export function FlexStyle(style: FlexStyleType, result) {
   }
   result["flex-flow"] = flexFlow;
 
-  let mainPlace = 0;
-  let crossPlace = 0;
-  let trackCrossPlace = 0;
+  let mainPlace = LV_FLEX_ALIGN_START;
+  let crossPlace = LV_FLEX_ALIGN_START;
+  let trackCrossPlace = LV_FLEX_ALIGN_START;
   const justifyContent = style["justify-content"];
   const alignItems = style["align-items"];
   const alignContent =
