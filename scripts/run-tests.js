@@ -20,6 +20,7 @@
 //   TEST_TIMEOUT_MS  hard kill safety net per test (default 15000)
 //   TEST_GLOB        optional substring filter; only matching test paths run
 //   TEST_SCREENSHOT_OUT  output directory for --capture (default <repo>/_screenshots)
+//   TEST_CAPTURE         set to "1" for each child test when --capture is active (stable screenshots)
 //
 // The harness is itself a lvgljs program, so it reports its verdict via
 // tjs.exit() (HARNESS_EXIT_OK / HARNESS_EXIT_FAIL / HARNESS_EXIT_ERROR).
@@ -134,8 +135,10 @@ async function runTest(absPath, relPath, screenshotPath = '') {
     tjs.env.TEST_RENDER_MS = String(renderMs);
     if (screenshotPath) {
         tjs.env.TEST_SCREENSHOT_PATH = screenshotPath;
+        tjs.env.TEST_CAPTURE = '1';
     } else {
         delete tjs.env.TEST_SCREENSHOT_PATH;
+        delete tjs.env.TEST_CAPTURE;
     }
 
     const proc = tjs.spawn([ tjs.exepath, 'run', runnerRel, relPath ], {
