@@ -8,6 +8,7 @@ import {
   setStyle,
   styleGetterProp,
 } from "../config";
+import path from 'tjs:path';
 
 const bridge = globalThis[Symbol.for('lvgljs')];
 const NativeGIF = bridge.NativeRender.NativeComponents.GIF;
@@ -53,9 +54,9 @@ function setGIFProps(comp, newProps: GIFProps, oldProps: GIFProps) {
         }
         if (!isValidUrl(url)) {
           if (!path.isAbsolute(url)) {
-            url = path.resolve(__dirname, url);
+            url = path.resolve(import.meta.dirname, url);
           }
-          fs.readFile(url, { encoding: "binary" })
+          tjs.readFile(url, { encoding: "binary" })
             .then((data) => applyGIF(comp, data.buffer, newProps.paused))
             .catch((e) => {
               console.log("setGIF error", e);

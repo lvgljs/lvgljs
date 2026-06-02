@@ -1,6 +1,7 @@
 import { StyleProps } from "./index";
 import { isValidUrl } from "../../utils/helpers";
 import { BUILT_IN_SYMBOL } from "./symbol";
+import path from "tjs:path";
 
 async function getImageBinary(url) {
   const resp = await fetch(url, {});
@@ -21,7 +22,7 @@ export function PostProcessStyle({ comp, styleSheet, styleType }: { comp: any; s
       comp.setBackgroundImage(null, styleType);
     } else if (!isValidUrl(url)) {
       if (!path.isAbsolute(url)) {
-        url = path.resolve(__dirname, url);
+        url = path.resolve(import.meta.dirname, url);
       }
       fs.readFile(url, { encoding: "binary" })
         .then((data) => {
@@ -49,7 +50,7 @@ export function PostProcessStyle({ comp, styleSheet, styleType }: { comp: any; s
       comp.setArcImage(null, styleType);
     } else if (!isValidUrl(url)) {
       if (!path.isAbsolute(url)) {
-        url = path.resolve(__dirname, url);
+        url = path.resolve(import.meta.dirname, url);
       }
       fs.readFile(url, { encoding: "binary" })
         .then((data) => {
