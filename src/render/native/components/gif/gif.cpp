@@ -35,6 +35,32 @@ void GIF::setGIFBinary(uint8_t* buf, size_t len) {
     }
 };
 
+void GIF::pause() {
+#if LV_USE_GIF
+    if (this->instance == nullptr) {
+        return;
+    }
+
+    lv_gif_t *gifobj = (lv_gif_t *)this->instance;
+    if (gifobj->gif != nullptr && gifobj->timer != nullptr) {
+        lv_timer_pause(gifobj->timer);
+    }
+#endif
+};
+
+void GIF::resume() {
+#if LV_USE_GIF
+    if (this->instance == nullptr) {
+        return;
+    }
+
+    lv_gif_t *gifobj = (lv_gif_t *)this->instance;
+    if (gifobj->gif != nullptr && gifobj->timer != nullptr) {
+        lv_timer_resume(gifobj->timer);
+    }
+#endif
+};
+
 GIF::~GIF () {
     if (this->gif_buf != nullptr) {
         free(this->gif_buf);
