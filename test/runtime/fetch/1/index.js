@@ -1,14 +1,9 @@
-import assert from 'tjs:assert';
-import path from 'tjs:path';
-
-const { createEchoServer } = await import(path.join(import.meta.dirname, '../../helpers/echo-server.js'));
-
-const { server, baseUrl } = createEchoServer();
+import assert from 'tjs:assert'
 
 async function basicFetch() {
-    const r = await fetch(`${baseUrl}/get`);
+    const r = await fetch('https://httpbin.org/get');
     assert.eq(r.status, 200, 'status is 200');
-}
+};
 
 async function abortFetch() {
     const controller = new AbortController();
@@ -17,29 +12,29 @@ async function abortFetch() {
         controller.abort();
     }, 500);
     try {
-        await fetch(`${baseUrl}/delay/3`, { signal });
+        await fetch('https://httpbin.org/delay/3', { signal });
     } catch (e) {
         assert.eq(e.name, 'AbortError', 'fetch was aborted');
     }
-}
+};
 
 async function fetchWithPostAndBody() {
     const data = JSON.stringify({ foo: 'bar', bar: 'baz' });
-    const r = await fetch(`${baseUrl}/post`, {
+    const r = await fetch('https://httpbin.org/post', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
-        body: data,
+        body: data
     });
     assert.eq(r.status, 200, 'status is 200');
     const json = await r.json();
-    assert.eq(JSON.stringify(json.data), data, 'sent and received data match');
-}
+    assert.eq(json.data, data, 'sent and received data match');
+};
+
 
 (async () => {
     await basicFetch();
     await abortFetch();
     await fetchWithPostAndBody();
-    await server.close();
 })();
