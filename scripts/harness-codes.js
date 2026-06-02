@@ -1,6 +1,7 @@
-// Shared exit codes for scripts/run-tests.js and scripts/gui-test-runner.js.
+// Shared exit codes for scripts/run-tests.js, scripts/gui-test-runner.js,
+// and scripts/cli-test-runner.js.
 
-/** A bundled GUI test finished its render window without crashing. */
+/** A test finished its async work and exited with TEST_EXIT_OK. */
 export const TEST_EXIT_OK = 95;
 
 /** The harness itself: all tests passed / some failed / internal error. */
