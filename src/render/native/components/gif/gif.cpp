@@ -40,10 +40,7 @@ void GIF::pause() {
         return;
     }
 
-    lv_gif_t *gifobj = (lv_gif_t *)this->instance;
-    if (gifobj->gif != nullptr && gifobj->timer != nullptr) {
-        lv_timer_pause(gifobj->timer);
-    }
+    lv_gif_pause(this->instance);
 #endif
 };
 
@@ -53,10 +50,7 @@ void GIF::resume() {
         return;
     }
 
-    lv_gif_t *gifobj = (lv_gif_t *)this->instance;
-    if (gifobj->gif != nullptr && gifobj->timer != nullptr) {
-        lv_timer_resume(gifobj->timer);
-    }
+    lv_gif_resume(this->instance);
 #endif
 };
 
