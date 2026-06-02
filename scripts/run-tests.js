@@ -2,14 +2,23 @@
 //
 //   lvgljs run scripts/run-tests.js [--capture] [filter]
 //
-// Every bundled test under test/**/index.js is a GUI program that starts the
-// LVGL event loop and never returns on its own. Each one is launched through
-// scripts/gui-test-runner.js, which loads the test, lets it render for a
-// short window, and then calls tjs.exit(TEST_EXIT_OK).
+// GUI tests under test/**/index.js start the LVGL event loop and never return
+// on their own. Each is launched through scripts/gui-test-runner.js, which
+// loads the test, lets it render for a short window, and then calls
+// tjs.exit(TEST_EXIT_OK).
+//
+// CLI tests under test/runtime/**/index.js are launched through
+// scripts/cli-test-runner.js; the test must finish its async work and call
+// tjs.exit(TEST_EXIT_OK) itself (or exit non-zero / throw on failure).
 //
 // Pass/fail logic:
 //   - exit TEST_EXIT_OK, no signal, no error markers -> pass
 //   - any other exit, crash/abort, killed, or error markers -> fail
+//
+// Expected failure (xfail): place an empty file named "xfail" next to index.js
+// (e.g. test/runtime/foo/xfail). A failing test is reported XFAIL and does not
+// fail the harness; a passing xfail test is reported XPASS and fails the harness.
+// Optional first line in xfail is printed as the reason.
 //
 // --capture saves a PNG per test under _screenshots/ (simulator build).
 //
@@ -38,7 +47,8 @@ const {
 } = await import(path.join(scriptDir, 'harness-codes.js'));
 const repoRoot = path.dirname(scriptDir);
 const testRoot = path.join(repoRoot, 'test');
-const runnerRel = 'scripts/gui-test-runner.js';
+const guiRunnerRel = 'scripts/gui-test-runner.js';
+const cliRunnerRel = 'scripts/cli-test-runner.js';
 
 const cli = getopts(tjs.args.slice(3), {
     boolean: [ 'capture' ],
@@ -61,7 +71,7 @@ const hardTimeoutMs = parseInt(tjs.env.TEST_TIMEOUT_MS || '15000', 10);
 
 // Per-test render window (ms) when the default is too short (e.g. remote GIF fetch).
 const RENDER_MS_OVERRIDES = {
-    'test/gif/1/index.js': 8000,
+    'test/gif/1/index.js': defaultRenderMs,
 };
 
 function resolveRenderMs(relPath) {
@@ -144,18 +154,61 @@ async function screenshotExists(filePath) {
     }
 }
 
-async function runTest(absPath, relPath, screenshotPath = '') {
-    const testRenderMs = resolveRenderMs(relPath);
-    tjs.env.TEST_RENDER_MS = String(testRenderMs);
-    if (screenshotPath) {
-        tjs.env.TEST_SCREENSHOT_PATH = screenshotPath;
-        tjs.env.TEST_CAPTURE = '1';
-    } else {
-        delete tjs.env.TEST_SCREENSHOT_PATH;
-        delete tjs.env.TEST_CAPTURE;
+/** @returns {{ expected: boolean, reason: string }} */
+async function readExpectedFail(absPath) {
+    const xfailPath = path.join(path.dirname(absPath), 'xfail');
+    try {
+        const st = await tjs.stat(xfailPath);
+        if (!st.isFile) {
+            return { expected: false, reason: '' };
+        }
+    } catch (_) {
+        return { expected: false, reason: '' };
     }
 
-    const proc = tjs.spawn([ tjs.exepath, 'run', runnerRel, relPath ], {
+    let reason = '';
+    try {
+        const data = await tjs.readFile(xfailPath);
+        reason = new TextDecoder().decode(data).split(/\r?\n/)[0].trim();
+    } catch (_) {
+        // empty xfail file is fine
+    }
+
+    return { expected: true, reason };
+}
+
+function logTestFailureOutput(result, reason) {
+    console.log(`      reason: ${reason}`);
+    if (result.stdout) {
+        console.log('--- stdout ---\n' + result.stdout);
+    }
+    if (result.stderr) {
+        console.log('--- stderr ---\n' + result.stderr);
+    }
+}
+
+async function runTest(absPath, relPath, screenshotPath = '', isRuntimeTest = false) {
+    const testRenderMs = resolveRenderMs(relPath);
+    if (isRuntimeTest) {
+        delete tjs.env.TEST_RENDER_MS;
+        delete tjs.env.TEST_SCREENSHOT_PATH;
+        delete tjs.env.TEST_CAPTURE;
+    } else {
+        tjs.env.TEST_RENDER_MS = String(testRenderMs);
+        if (screenshotPath) {
+            tjs.env.TEST_SCREENSHOT_PATH = screenshotPath;
+            tjs.env.TEST_CAPTURE = '1';
+        } else {
+            delete tjs.env.TEST_SCREENSHOT_PATH;
+            delete tjs.env.TEST_CAPTURE;
+        }
+    }
+
+    const spawnArgs = isRuntimeTest
+        ? [ tjs.exepath, 'run', cliRunnerRel, relPath ]
+        : [ tjs.exepath, 'run', guiRunnerRel, relPath ];
+
+    const proc = tjs.spawn(spawnArgs, {
         cwd: repoRoot,
         stdout: 'pipe',
         stderr: 'pipe',
@@ -214,7 +267,6 @@ async function main() {
     const tests = (await findTests(testRoot))
         .map((p) => ({ abs: p, rel: toRelative(p) }))
         .filter((t) => t.rel.includes(filter))
-        .filter((t) => !captureMode || !t.rel.startsWith('test/runtime/'))
         .sort((a, b) => (a.rel < b.rel ? -1 : a.rel > b.rel ? 1 : 0));
 
     if (tests.length === 0) {
@@ -233,33 +285,60 @@ async function main() {
     console.log(`Found ${tests.length} test(s) (${modeLabel}). Default render window: ${defaultRenderMs}ms, hard timeout: ${hardTimeoutMs}ms\n`);
 
     const failures = [];
+    let xfailCount = 0;
     for (const test of tests) {
-        const screenshotPath = captureMode
+        const isRuntimeTest = test.rel.startsWith('test/runtime/');
+        const screenshotPath = (captureMode && !isRuntimeTest)
             ? path.join(screenshotOut, pngName(test.rel))
             : '';
         const testRenderMs = resolveRenderMs(test.rel);
-        const result = await runTest(test.abs, test.rel, screenshotPath);
+        const xfail = await readExpectedFail(test.abs);
+        const result = await runTest(test.abs, test.rel, screenshotPath, isRuntimeTest);
         const renderNote = testRenderMs !== defaultRenderMs ? ` (${testRenderMs}ms)` : '';
-        console.log(`${result.ok ? 'PASS' : 'FAIL'}  ${test.rel}${renderNote}`);
-        if (!result.ok) {
-            failures.push({ test, result });
-            console.log(`      reason: ${result.reason}`);
-            if (result.stdout) {
-                console.log('--- stdout ---\n' + result.stdout);
-            }
-            if (result.stderr) {
-                console.log('--- stderr ---\n' + result.stderr);
-            }
+
+        let verdict;
+        let harnessOk;
+        if (xfail.expected && !result.ok) {
+            verdict = 'XFAIL';
+            harnessOk = true;
+            xfailCount++;
+        } else if (xfail.expected && result.ok) {
+            verdict = 'XPASS';
+            harnessOk = false;
+        } else {
+            verdict = result.ok ? 'PASS' : 'FAIL';
+            harnessOk = result.ok;
+        }
+
+        console.log(`${verdict} ${isRuntimeTest ? 'CLI' : 'GUI'} ${test.rel}${renderNote}`);
+        if (xfail.expected && xfail.reason) {
+            console.log(`      xfail: ${xfail.reason}`);
+        }
+        if (!harnessOk) {
+            failures.push({ test, result, verdict });
+            const reason = verdict === 'XPASS'
+                ? 'passed but is marked xfail (remove xfail when fixed)'
+                : result.reason;
+            logTestFailureOutput(result, reason);
+        } else if (verdict === 'XFAIL') {
+            logTestFailureOutput(result, result.reason);
         }
     }
-
-    console.log(`\n${tests.length - failures.length}/${tests.length} test(s) passed.`);
 
     if (failures.length > 0) {
         console.log('\nFailed tests:');
         for (const f of failures) {
-            console.log(`  - ${f.test.rel}`);
+            console.log(`  - ${f.test.rel}${f.verdict === 'XPASS' ? ' (unexpected pass)' : ''}`);
         }
+    }
+
+    const passCount = tests.length - failures.length;
+    const summary = xfailCount > 0
+        ? `${passCount}/${tests.length} test(s) passed (${xfailCount} expected failure(s)).`
+        : `${passCount}/${tests.length} test(s) passed.`;
+    console.log(`\n${summary}`);
+
+    if (failures.length > 0) {
         tjs.exit(HARNESS_EXIT_FAIL);
         return;
     }
