@@ -2,9 +2,9 @@ import assert from 'tjs:assert'
 import path from 'tjs:path'
 
 const { TEST_EXIT_OK } = await import(path.join(import.meta.dirname, '../../../../scripts/harness-codes.js'))
+const { createEchoServer } = await import(path.join(import.meta.dirname, '../../../../scripts/helpers/echo-server.js'))
 
-// const baseUrl = 'https://httpbin.org'
-const baseUrl = 'https://httpbun.com'
+const { server, baseUrl } = createEchoServer()
 const BINARY_SIZE = 90
 
 async function basicFetch() {
@@ -36,12 +36,11 @@ async function fetchWithPostAndBody() {
     });
     assert.eq(r.status, 200, 'status is 200');
     const json = await r.json();
-    assert.eq(json.data, data, 'sent and received data match');
+    assert.eq(JSON.stringify(json.data), data, 'sent and received data match');
 };
 
 async function fetchBinaryWithArrayBuffer() {
     const url = `${baseUrl}/bytes/${BINARY_SIZE}`;
-    // const url ="http://p0.itc.cn/q_70/images03/20200807/9405b7432e34421b866f35a087812b6f.gif"
     const resp = await fetch(url, {
         headers: {
             'Content-Type': 'application/octet-stream',
@@ -66,6 +65,11 @@ async function runTests() {
     } catch (e) {
         console.error(e && e.stack ? e.stack : e);
         exitCode = 1;
+    }
+    try {
+        await server.close();
+    } catch {
+        // ignore
     }
     tjs.exit(exitCode);
 })();
