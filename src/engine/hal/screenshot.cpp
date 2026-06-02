@@ -1,0 +1,88 @@
+
+#include "screenshot.hpp"
+
+#if LV_USE_SNAPSHOT
+
+#include <stdlib.h>
+
+#include "framebuffer32_to_rgba.h"
+#include "render/native/core/img/png/lodepng.h"
+
+bool hal_capture_display_png(const char * path)
+{
+    if(!path || path[0] == '\0') return false;
+
+    lv_obj_t * scr = lv_scr_act();
+    if(!scr) return false;
+
+    lv_img_dsc_t * snapshot = lv_snapshot_take(scr, LV_IMG_CF_TRUE_COLOR_ALPHA);
+    if(!snapshot) return false;
+
+    const int w = snapshot->header.w;
+    const int h = snapshot->header.h;
+    if(w <= 0 || h <= 0) {
+        lv_snapshot_free(snapshot);
+        return false;
+    }
+
+    const size_t rgba_size = (size_t)w * (size_t)h * 4;
+    unsigned char * rgba = (unsigned char *)malloc(rgba_size);
+    if(!rgba) {
+        lv_snapshot_free(snapshot);
+        return false;
+    }
+
+    const uint32_t stride = (uint32_t)w * sizeof(uint32_t);
+    bool converted = framebuffer32_to_rgba((const uint32_t *)snapshot->data, rgba, w, h, stride);
+    lv_snapshot_free(snapshot);
+
+    if(!converted) {
+        free(rgba);
+        return false;
+    }
+
+    const unsigned err = lodepng_encode32_file(path, rgba, (unsigned)w, (unsigned)h);
+    free(rgba);
+    return err == 0;
+}
+
+#else
+
+bool hal_capture_display_png(const char * path)
+{
+    (void)path;
+    return false;
+}
+
+#endif /* LV_USE_SNAPSHOT */
+
+static JSValue js_capture_display(JSContext * ctx, JSValueConst this_val, int argc, JSValueConst * argv)
+{
+    if(argc < 1) {
+        return JS_ThrowTypeError(ctx, "captureDisplay(path) requires a file path");
+    }
+
+    const char * path = JS_ToCString(ctx, argv[0]);
+    if(!path) {
+        return JS_EXCEPTION;
+    }
+
+    bool ok = hal_capture_display_png(path);
+    JS_FreeCString(ctx, path);
+    return JS_NewBool(ctx, ok);
+}
+
+static const JSCFunctionListEntry screenshot_funcs[] = {
+    TJS_CFUNC_DEF("captureDisplay", 0, js_capture_display),
+};
+
+void NativeScreenshotInit(JSContext * ctx, JSValue ns)
+{
+    JSValue render_util = JS_GetPropertyStr(ctx, ns, "RenderUtil");
+    if(JS_IsUndefined(render_util)) {
+        render_util = JS_NewObject(ctx);
+        JS_SetPropertyStr(ctx, ns, "RenderUtil", render_util);
+    }
+    JS_SetPropertyFunctionList(ctx, render_util, screenshot_funcs, countof(screenshot_funcs));
+    JS_FreeValue(ctx, render_util);
+}

@@ -1,5 +1,6 @@
 #include "render_bootstrap.hpp"
 
+#include "engine/hal/screenshot.hpp"
 #include "native/components/component.hpp"
 #include "native/core/animate/animate.hpp"
 #include "native/core/dimensions/dimensions.hpp"
@@ -21,6 +22,8 @@ void NativeRenderInit (JSContext* ctx, JSValue ns) {
     NativeDimensionsInit(ctx, obj);
 
     NativeRenderUtilInit(ctx, obj);
+
+    NativeScreenshotInit(ctx, obj);
 
     NativeThemeInit(ctx, obj);
 
