@@ -14,13 +14,12 @@ void convert_color_depth(uint8_t * img, uint32_t px_cnt)
 {
 #if LV_COLOR_DEPTH == 32
     lv_color32_t * img_argb = (lv_color32_t*)img;
-    lv_color_t c;
-    lv_color_t * img_c = (lv_color_t *) img;
     uint32_t i;
     for(i = 0; i < px_cnt; i++) {
-        c = lv_color_make(img_argb[i].red, img_argb[i].green, img_argb[i].blue);
-        img_c[i].red = c.blue;
-        img_c[i].blue = c.red;
+        /* lodepng outputs RGBA; LVGL expects BGRA (lv_color32_t layout) */
+        uint8_t tmp = img_argb[i].blue;
+        img_argb[i].blue = img_argb[i].red;
+        img_argb[i].red = tmp;
     }
 #elif LV_COLOR_DEPTH == 16
     lv_color32_t * img_argb = (lv_color32_t*)img;
