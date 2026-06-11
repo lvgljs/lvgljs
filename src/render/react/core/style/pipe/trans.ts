@@ -1,3 +1,4 @@
+import { ANIM_PATH } from "../../lv_types";
 import {
   NormalizePx,
   NormalizeTime,
@@ -5,16 +6,6 @@ import {
   ProcessPx,
   ProcessScale,
 } from "../util";
-
-const timing_function = [
-  "linear",
-  "ease-in",
-  "ease-out",
-  "ease-in-out",
-  "overshoot",
-  "bounce",
-  "step",
-];
 
 const LV_STYLE_PROP_LAYOUT_REFR = 1 << 12;
 const LV_STYLE_PROP_EXT_DRAW = 1 << 11;
@@ -257,14 +248,15 @@ export function TransStyle(style: TransStyleType, result, compName) {
       .filter((item) => !!item);
 
     const duration = style["transition-duration"] || 0;
-    const func = style["transition-timing-function"] || "linear";
+    const funcKey = style["transition-timing-function"] || "linear";
+    const funcIdx = ANIM_PATH[funcKey] ?? ANIM_PATH.linear;
     const delay = style["transition-delay"] || 0;
 
     const trans = [
       properties.length,
       properties,
       NormalizeTime(duration),
-      func,
+      funcIdx,
       delay,
     ];
     result["transition"] = trans;
