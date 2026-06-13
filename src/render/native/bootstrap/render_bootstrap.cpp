@@ -51,5 +51,5 @@ void NativeRenderInit (JSContext* ctx, JSValue ns) {
 
 lv_style_prop_t lvjs_style_register_prop(void)
 {
-    return lv_style_register_prop();
+    return lv_style_register_prop(LV_STYLE_PROP_FLAG_NONE);
 }
